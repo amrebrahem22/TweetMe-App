@@ -2,6 +2,27 @@
 {% block main %}
 	<p>Detail</p>
 	<h1>{{ object.username }}</h1>
+	<p>Following: {{ object.profile }}</p>
+	<p>
+		{% for user in object.profile.following.all %} 
+			<a href="/{{user.username}}/">
+				{{user.username}}
+			</a> | 
+			{% empty %}
+				<p>Doesn't Follow anyone.</p>
+		{% endfor %}
+	</p>
+
+	<p>Followers: {{ object.followed_by.count }}</p>
+	<p>
+		{% for profile in object.followed_by.all %} 
+			<a href="/{{profile.user.username}}/">
+				{{profile.user.username}}
+			</a> |
+			{% empty %}
+				<p>Doesn't has any Followers.</p> 
+		{% endfor %}
+	</p>
 	<hr/>
 	<h1>Tweets</h1>
 	<div>
