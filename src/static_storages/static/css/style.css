@@ -1979,7 +1979,7 @@ h1, h2, p, a, span{
               padding-left: 10px;
             }
       .tweets {
-        height: 375px;
+        height: auto;
       }
         .tweets .titular {
           background: #35aadc;
@@ -1989,12 +1989,14 @@ h1, h2, p, a, span{
             padding-right: 20px;
           }
         .tweet.first {
-          height: 150px;
-          border-bottom: 1px solid #1f253d;
+          height: auto;
+          border-bottom: 25px solid #1f253d;
+          padding: 0 0 27px 0;
         }
           .tweet p:first-child {
             margin: 0;
             padding: 30px 30px 0;
+            color: #efe8e9;
           }
           .tweet p:last-child {
             margin: 0;
@@ -2213,3 +2215,72 @@ h1, h2, p, a, span{
             background: #e64c65;
             border-radius: 100%;
           }
+/* custom style */
+.tweets-container {
+
+}
+
+.tweets-container .tweet-form {
+
+background: transparent;
+
+border-radius: 15px;
+
+border-color: #394264;
+color: #fff;
+resize: none;
+padding: 15px
+}
+
+.tweets-container p {
+
+color: #556292;
+
+font-style: italic;
+
+letter-spacing: 1px;
+
+padding-top: 5px;
+
+margin-bottom: 5px;
+}
+
+.tweet-btn {
+  display: block;
+  background: 
+  #35aadc;
+  border: none;
+  outline: none;
+  margin-bottom: 15px;
+  color: #fff;
+  padding: 5px 27px;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all .5s ease-in-out;
+}
+.tweet-btn:hover {
+  background: #4dbdec
+}
+
+.search {
+  display: inline;
+  float: left;
+  width: 30%;
+  margin-top: 16px;
+}
+.search input[type=text] {
+  border-radius: 0 0 0 15px;
+  outline: none;
+}
+.search input[type=submit] {
+  height: 100%;
+  background: #e64c65;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 12px 9px;
+  border-radius: 0 0 15px 0;
+  cursor: pointer;
+  outline: none;
+}

@@ -1,7 +1,10 @@
 from django.urls import path
+from django.views.generic.base import RedirectView
+from .views import TweetsListView, TweetsCreateView
 
-from .views import index
+app_name = "tweet"
 
 urlpatterns = [
-	path('', index, name='index'),
+	path('', RedirectView.as_view(url="/"), name='index'),
+	path('create/', TweetsCreateView.as_view(), name='create'),
 ]
