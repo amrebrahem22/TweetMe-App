@@ -2284,3 +2284,21 @@ margin-bottom: 5px;
   cursor: pointer;
   outline: none;
 }
+
+#loadMore {
+  width: 20%;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid #4fc4f6;
+  text-align: center;
+  padding: 5px 5px;
+  text-decoration: none;
+  color: #4fc4f6;
+  opacity: .8;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all .5s ease-in-out;
+}
+#loadMore:hover {
+  opacity: 1;
+}
