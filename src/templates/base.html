@@ -135,6 +135,7 @@
 
             <!-- MIDDLE-CONTAINER -->
             <div class="middle-container container tweets-container">
+            	{% block main %}
             	<form class="create-tweet" action="{% url 'tweet:create' %}" method="POST">
             		{% csrf_token %}
             		{{form.content}}
@@ -142,8 +143,12 @@
             		<input type="submit" class="tweet-btn" value="Tweet">
             	</form>
             	
-                {% include 'tweets.html' %}
-            	}
+                <div class="tweets block" style="margin-bottom: 0;"> <!-- TWEETS (MIDDLE-CONTAINER) -->
+				    <h2 class="titular"><span class="icon zocial-twitter"></span>LATEST TWEETS</h2>
+				</div> 
+				<div class="tweets block tweet-container"></div>
+				<div><a href="" id="loadMore">Load more</a></div>
+            	{% endblock main %}
             </div>
 
             <!-- RIGHT-CONTAINER -->

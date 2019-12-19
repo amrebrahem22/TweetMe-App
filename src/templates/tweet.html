@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block main %}
+	<p>Detail</p>
+	<h1>{{ object.username }}</h1>
+	<hr/>
+	<h1>Tweets</h1>
+	<div>
+		{% for tweet in object.tweet_set.all %}
+			<p>{{ tweet }}</p>
+		{% endfor %}
+	</div>
+{% endblock %}

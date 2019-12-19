@@ -9,7 +9,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TweetsListView.as_view(), name="index"),
     path('tweet/', include('tweets.urls', namespace="tweet")),
-    path('api/tweets/', include('tweets.api.urls'))
+    path('api/tweets/', include('tweets.api.urls')),
+    path('profiles/<username>/', include('accounts.urls')),
 ]
 
 if settings.DEBUG:
