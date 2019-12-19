@@ -299,7 +299,7 @@
 				}
 
 				function displayTweets(tweetVal, prepend) {
-					var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='#' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a></p>" + "</div>";
+					var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a></p>" + "</div>";
 					if (prepend == true) {
 						$('.tweet-container').prepend(tweet)
 					} else {
