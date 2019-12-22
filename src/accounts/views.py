@@ -13,15 +13,16 @@ class UserDetailView(DetailView):
 	def get_object(self):
 		return get_object_or_404(User, username__iexact=self.kwargs.get('username'))
 
+	def get_context_data(self, *args, **kwargs):
+		context = super(UserDetailView, self).get_context_data(*args, **kwargs)
+		context['following'] = UserProfile.objects.is_following(self.request.user, self.get_object())
+		return context
+
 
 class UserFollow(View):
 	def get(self, request, username, *args, **kwargs):
 		user_qs = get_object_or_404(User, username__iexact=username)
 		if request.user.is_authenticated:
-			user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-			if user_qs in user_profile.following.all():
-				user_profile.following.remove(user_qs)
-			else:
-				user_profile.following.add(user_qs)
+			is_following = UserProfile.objects.toggle_follow(request.user, user_qs)
 
 		return redirect('accounts:profile', username=username)

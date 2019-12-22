@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.urls import reverse_lazy
 
 # for the reverse relationship "followed_by"
 class UserProfileManager(models.Manager):
@@ -23,6 +24,24 @@ class UserProfileManager(models.Manager):
 			pass
 		return qs.count()
 
+	# toggle Follow
+	def toggle_follow(self, user, to_follow):
+		user_profile, created = UserProfile.objects.get_or_create(user=user)
+		if to_follow in user_profile.following.all():
+			user_profile.following.remove(to_follow)
+			added = False
+		else:
+			user_profile.following.add(to_follow)
+			added = True
+		return added
+
+	# Is Following
+	def is_following(self, user, user_following):
+		user_profile, created = UserProfile.objects.get_or_create(user=user)
+		if user_following in user_profile.following.all() or created:
+			return True
+		return False
+
 
 class UserProfile(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile', on_delete=models.CASCADE)
@@ -38,4 +57,8 @@ class UserProfile(models.Model):
 		qs = self.following.all()
 		return qs.exclude(username=self.user.username)
 
+	def get_follow_url(self):
+		return reverse_lazy('accounts:follow', kwargs={'username': self.user.username})
 
+	def get_absolute_url(self):
+		return reverse_lazy('accounts:profile', kwargs={'username': self.user.username})

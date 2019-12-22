@@ -2,7 +2,7 @@
 {% block main %}
 	<p>Detail</p>
 	<h1>{{ object.username }}</h1>
-	<a href="{% url 'accounts:follow' username=object.username %}">Follow</a>
+	<a href="{{ object.profile.get_follow_url }}">{% if following %}Unfollow{% else %}Follow{% endif %}</a>
 	<p>Following: {{ object.profile.get_following.count }}</p>
 	<p>
 		{% for user in object.profile.get_following %} 
