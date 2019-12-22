@@ -2,9 +2,9 @@
 {% block main %}
 	<p>Detail</p>
 	<h1>{{ object.username }}</h1>
-	<p>Following: {{ object.profile }}</p>
+	<p>Following: {{ object.profile.get_following.count }}</p>
 	<p>
-		{% for user in object.profile.following.all %} 
+		{% for user in object.profile.get_following %} 
 			<a href="/{{user.username}}/">
 				{{user.username}}
 			</a> | 
