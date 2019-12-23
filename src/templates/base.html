@@ -5,6 +5,9 @@
 	<title>{% block title %}Home{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="{% static 'static/css/bootstrap.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'static/css/style.css' %}">
+    <style type="text/css">
+        .tweet a {color: #4fc4f6;}
+    </style>
 </head>
 <body>
 <div class="main-container">
@@ -287,6 +290,15 @@
 				var tweetsList = [];
 				var nextUrlPage;
 
+                function updateHashLinks(){
+                    $(".tweet").each(function(data){
+                        var hashtagRegex = /(^|\s)#([\w\d-]+)/g
+                        var newText = $(this).html().replace(hashtagRegex, "$1<a href='/tags/$2/'>#$2</a>")
+                        $(this).html(newText)
+                    
+                })
+              }
+
 				function getParameterByName( name ){
 					var regexS = "[\\?&]"+name+"=([^&#]*)", 
 					regex = new RegExp( regexS ),
@@ -316,6 +328,7 @@
 					} else {
 						$.each(tweetsList, function(key, value) {
 							displayTweets(value)
+                            updateHashLinks()
 						});
 					}
 				}
@@ -340,6 +353,7 @@
 								$('#loadMore').css('display', 'none')
 							}
 							tweets()
+                            updateHashLinks()
 						},
 						error: function(error) {
 							console.log(error)
