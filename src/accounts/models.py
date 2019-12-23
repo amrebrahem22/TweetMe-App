@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.db.models.signals import post_save
 
 # for the reverse relationship "followed_by"
 class UserProfileManager(models.Manager):
@@ -62,3 +63,11 @@ class UserProfile(models.Model):
 
 	def get_absolute_url(self):
 		return reverse_lazy('accounts:profile', kwargs={'username': self.user.username})
+
+
+
+def post_save_profile(sender, instance, created, *args, **kwargs):
+	if created:
+		UserProfile.objects.create(user=instance)
+
+post_save.connect(post_save_profile, sender=settings.AUTH_USER_MODEL)
