@@ -2,7 +2,9 @@
 {% block main %}
 	<p>Detail</p>
 	<h1>{{ object.username }}</h1>
-	<a href="{{ object.profile.get_follow_url }}">{% if following %}Unfollow{% else %}Follow{% endif %}</a>
+	{% if object != request.user %}
+		<a href="{{ object.profile.get_follow_url }}">{% if following %}Unfollow{% else %}Follow{% endif %}</a>
+	{% endif %}
 	<p>Following: {{ object.profile.get_following.count }}</p>
 	<p>
 		{% for user in object.profile.get_following %} 
@@ -25,7 +27,7 @@
 		{% endfor %}
 	</p>
 	<hr/>
-	<h1>Tweets</h1>
+	<h1>Tweets({{object.tweet_set.all.count}})</h1>
 	<div>
 		{% for tweet in object.tweet_set.all %}
 			<p>{{ tweet }}</p>

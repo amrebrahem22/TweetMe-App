@@ -136,6 +136,16 @@
                 </ul>
             </div>
 
+
+
+
+
+
+
+
+
+
+
             <!-- MIDDLE-CONTAINER -->
             <div class="middle-container container tweets-container">
             	{% block main %}
@@ -153,6 +163,15 @@
 				<div><a href="" id="loadMore">Load more</a></div>
             	{% endblock main %}
             </div>
+
+
+
+
+
+
+
+
+            
 
             <!-- RIGHT-CONTAINER -->
             <div class="right-container container">
@@ -310,8 +329,16 @@
 					}
 				}
 
-				function displayTweets(tweetVal, prepend) {
-					var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a></p>" + "</div>";
+				function displayTweets(tweetVal, prepend, retweet) {
+
+                    if (retweet && tweetVal.parent) {
+                        var mainTweet = tweetVal.parent;
+                        console.log(mainTweet)
+                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/retweet/'>Retweet</a>" + "</div>";
+                    } else {
+                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/retweet/'>Retweet</a></p>" + "</div>";    
+                    }
+					
 					if (prepend == true) {
 						$('.tweet-container').prepend(tweet)
 					} else {
@@ -327,6 +354,9 @@
 
 					} else {
 						$.each(tweetsList, function(key, value) {
+                            if (value.parent) {
+                                displayTweets(value, false, true)    
+                            }
 							displayTweets(value)
                             updateHashLinks()
 						});

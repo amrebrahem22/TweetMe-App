@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block main %}
+	
+	<h1>#{{hashtag.tag}}</h1>
+	<div>
+		{% for tweet in hashtag.get_tweets %}
+			<p>{{ tweet.content }}</p>
+		{% endfor %}
+	</div>
+{% endblock %}

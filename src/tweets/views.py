@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.db.models import Q
 
@@ -10,6 +12,15 @@ from .mixins import FormUserNeededMixin
 # Create your views here.
 def index(request):
 	return render(request, 'base.html')
+
+
+class Retweet(View):
+	def get(self, request, pk, *args, **kwargs):
+		tweet = get_object_or_404(Tweet, pk=pk)
+		if request.user.is_authenticated:
+			new_tweet = Tweet.objects.retweet(request.user, tweet)
+			return HttpResponseRedirect(tweet.get_absolute_url())
+		return HttpResponseRedirect(tweet.get_absolute_url())
 
 
 class TweetsListView(ListView):
@@ -28,6 +39,11 @@ class TweetsListView(ListView):
 		context = super().get_context_data(**kwargs)
 		context['form'] = TweetForm()
 		return context
+
+
+class TweetDetailView(DetailView):
+	model = Tweet
+	template_name = 'single.html'
 
 
 class TweetsCreateView(FormUserNeededMixin, CreateView):
