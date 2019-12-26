@@ -1,6 +1,9 @@
 from django.db.models import Q
 from rest_framework import permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework import generics
+
 from tweets.models import Tweet
 from .serializers import TweetSerializer
 from .pagination import TweetsPagination
@@ -20,6 +23,27 @@ class TweetList(generics.ListAPIView):
 				Q(user__username__icontains=self.request.GET.get('q'))
 			)
 		return queryset	
+
+
+class TweetRetrieveAPIView(generics.RetrieveAPIView):
+	serializer_class = TweetSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	queryset = Tweet.objects.all()
+
+
+class RetweetAPIView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def get(self, request, pk, format=None):
+		tweet_qs = Tweet.objects.filter(pk=pk)
+		message = "Not Allowed"
+		if tweet_qs.exists() and tweet_qs.count() == 1:
+			tweet = Tweet.objects.retweet(request.user, tweet_qs.first())
+			if tweet is not None:
+				data = TweetSerializer(tweet).data
+				return Response(data)
+			message = "Can not Retweet at the same day."
+		return Response({"message": message}, status=404)
 
 
 class TweetCreateAPIView(generics.CreateAPIView):

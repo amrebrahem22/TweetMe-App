@@ -1,7 +1,11 @@
+import re
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models.signals import post_save 
+
+from hashtags.signals import parsed_hashtags
 
 User = settings.AUTH_USER_MODEL
 
@@ -50,3 +54,17 @@ class Tweet(models.Model):
 	class Meta:
 		ordering = ['-timestamp']
 
+
+
+def post_save_tweet_reciever(sender, instance, created, *args, **kwargs):
+	if created:
+		reg_user = r'@(P?<username>[\w.@+-]+)'
+		username = re.findall(reg_user, instance.content)
+
+		reg_hashtag = r'#(P?<hashtag>[\w\d-]+)'
+		hashtags = re.findall(reg_hashtag, instance.content)
+
+		parsed_hashtags.send(instance.__class__, hashtag_list=hashtags)
+
+
+post_save.connect(post_save_tweet_reciever, sender=Tweet)

@@ -309,14 +309,39 @@
 				var tweetsList = [];
 				var nextUrlPage;
 
+                $(document.body).on('click', '.retweetBtn',function (e) {
+                    e.preventDefault();
+                    var btnUrl = 'api' + $(this).attr('href');
+
+                    $.ajax({
+                        url: btnUrl,
+                        method: 'GET',
+                        success: function (data) {
+                            console.log(data);
+                            displayTweets(data, true, true)
+                            updateHashLinks()
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                });
+
                 function updateHashLinks(){
                     $(".tweet").each(function(data){
                         var hashtagRegex = /(^|\s)#([\w\d-]+)/g
-                        var newText = $(this).html().replace(hashtagRegex, "$1<a href='/tags/$2/'>#$2</a>")
+                        var usernameRegex = /(^|\s)@([\w\d-]+)/g
+                        var currentHtml = $(this).html();
+                        var newText;
+                        
+                        newText = currentHtml.replace(hashtagRegex, "$1<a href='/tags/$2/'>#$2</a>")
+                        newText = newText.replace(usernameRegex, "$1 <a href='/$2/'>@$2</a>")
                         $(this).html(newText)
                     
-                })
-              }
+                    })
+                }
+
+
 
 				function getParameterByName( name ){
 					var regexS = "[\\?&]"+name+"=([^&#]*)", 
@@ -334,9 +359,9 @@
                     if (retweet && tweetVal.parent) {
                         var mainTweet = tweetVal.parent;
                         console.log(mainTweet)
-                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/retweet/'>Retweet</a>" + "</div>";
+                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a>" + "</div>";
                     } else {
-                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/retweet/'>Retweet</a></p>" + "</div>";    
+                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a></p>" + "</div>";    
                     }
 					
 					if (prepend == true) {
@@ -421,6 +446,7 @@
 								displayTweets(data, true)
 								$('.create-tweet').find('textarea').val('')
 								CounterP.text("Maximum length 140 character");
+                                updateHashLinks();
 							},
 							error: function(error) {
 								console.log(error)
