@@ -159,7 +159,7 @@
                 <div class="tweets block" style="margin-bottom: 0;"> <!-- TWEETS (MIDDLE-CONTAINER) -->
 				    <h2 class="titular"><span class="icon zocial-twitter"></span>LATEST TWEETS</h2>
 				</div> 
-				<div class="tweets block tweet-container"></div>
+				<div class="tweets block tweet-container" id="tweets-container" data-url='/api/tweets/'></div>
 				<div><a href="" id="loadMore">Load more</a></div>
             	{% endblock main %}
             </div>
@@ -303,11 +303,41 @@
 	{% block scripts %}
 		<script> 
 
-			$(document).ready(function() {
+            function loadTweetsContainer(containerID) {
+                var query = getParameterByName('q');
+                var tweetsList = [];
+                var nextUrlPage;
+                var tweetContainer;
+                if (containerID) {
+                    tweetContainer = $('#' + containerID);
+                } else {
+                    tweetContainer = $('#tweets-container')
+                }
+                var initialUrl = tweetContainer.attr('data-url') || '/api/tweets/';
+                console.log(tweetContainer)
 
-				var query = getParameterByName('q');
-				var tweetsList = [];
-				var nextUrlPage;
+
+                $(document.body).on('click', '.tweet-like', function (e) {
+                    e.preventDefault();
+                    var this_ = $(this);
+                    var btnUrl = '/api/tweets/' + this_.attr('data-id') + '/like/';
+                    console.log(btnUrl);
+
+                    $.ajax({
+                        url: btnUrl,
+                        method: 'GET',
+                        success: function (data) {
+                            if (data.liked) {
+                                this_.text('Unlike')
+                            } else {
+                                this_.text('Like')
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                });
 
                 $(document.body).on('click', '.retweetBtn',function (e) {
                     e.preventDefault();
@@ -343,79 +373,97 @@
 
 
 
-				function getParameterByName( name ){
-					var regexS = "[\\?&]"+name+"=([^&#]*)", 
-					regex = new RegExp( regexS ),
-					results = regex.exec( window.location.search );
-					if( results == null ){
-					return "";
-					} else{
-					return decodeURIComponent(results[1].replace(/\+/g, " "));
-					}
-				}
+                function getParameterByName( name ){
+                    var regexS = "[\\?&]"+name+"=([^&#]*)", 
+                    regex = new RegExp( regexS ),
+                    results = regex.exec( window.location.search );
+                    if( results == null ){
+                    return "";
+                    } else{
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                    }
+                }
 
-				function displayTweets(tweetVal, prepend, retweet) {
+                function displayTweets(tweetVal, prepend, retweet) {
+
+                    var verb = 'Like';
+                    if (tweetVal.did_liked) {
+                        verb = 'Unlike';
+                    }
+                    console.log(tweetVal.did_liked)
 
                     if (retweet && tweetVal.parent) {
                         var mainTweet = tweetVal.parent;
-                        console.log(mainTweet)
-                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a>" + "</div>";
+                        
+                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='tweet-like time-ago scnd-font-color' href='#' data-id="+ tweetVal.id +">" + verb + "(" + tweetVal.likes + ")</a></div>";
                     } else {
-                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a></p>" + "</div>";    
+                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='tweet-like time-ago scnd-font-color' href='#' data-id="+ tweetVal.id +">" + verb + "(" + tweetVal.likes + ")</a></p></div>";    
                     }
-					
-					if (prepend == true) {
-						$('.tweet-container').prepend(tweet)
-					} else {
-						$('.tweet-container').append(tweet)
-					}
-				}
+                    
+                    if (prepend == true) {
+                        $(tweetContainer).prepend(tweet)
+                    } else {
+                        $(tweetContainer).append(tweet)
+                    }
+                }
 
-				function tweets() {
+                function tweets() {
 
-					if (tweetsList == 0) {
-						var tweet = "<div class='tweet first'>" + "<p>No Tweets Yet.</p></div>";
-						$('.tweet-container').append(tweet)
+                    if (tweetsList == 0) {
+                        var tweet = "<div class='tweet first'>" + "<p>No Tweets Yet.</p></div>";
+                        $(tweetContainer).append(tweet)
 
-					} else {
-						$.each(tweetsList, function(key, value) {
+                    } else {
+                        $.each(tweetsList, function(key, value) {
                             if (value.parent) {
                                 displayTweets(value, false, true)    
                             }
-							displayTweets(value)
+                            displayTweets(value)
                             updateHashLinks()
-						});
-					}
-				}
+                        });
+                    }
+                }
 
-				function fetchTweets(url) {
-					var urlPath;
+                function fetchTweets(url) {
+                    var urlPath;
 
-					if (!url) {
-						urlPath = '/api/tweets/';
-					} else {
-						urlPath = url
-					}
-					$.ajax({
-						url: urlPath,
-						method: 'GET',
-						data: { 'q': query},
-						success: function(data) {
-							tweetsList = data.results
-							if (data.next) {
-								nextUrlPage = data.next
-							} else {
-								$('#loadMore').css('display', 'none')
-							}
-							tweets()
+                    if (!url) {
+                        urlPath = initialUrl;
+                    } else {
+                        urlPath = url
+                    }
+                    $.ajax({
+                        url: urlPath,
+                        method: 'GET',
+                        data: { 'q': query},
+                        success: function(data) {
+                            tweetsList = data.results
+                            if (data.next) {
+                                nextUrlPage = data.next
+                            } else {
+                                $('#loadMore').css('display', 'none')
+                            }
+                            tweets()
                             updateHashLinks()
-						},
-						error: function(error) {
-							console.log(error)
-						}
-					});
-				}
-				fetchTweets()
+                        },
+                        error: function(error) {
+                            console.log(error)
+                        }
+                    });
+                }
+                fetchTweets()
+
+                $('#loadMore').click(function(e) {
+                    e.preventDefault();
+                    if (nextUrlPage) {
+                        fetchTweets(nextUrlPage);
+                    }
+                });
+            }
+
+			$(document).ready(function() {
+
+				loadTweetsContainer();
 
 				var startLength = 140;
 				var currLength = 0;
@@ -480,12 +528,7 @@
 					}
 				}
 
-				$('#loadMore').click(function(e) {
-					e.preventDefault();
-					if (nextUrlPage) {
-						fetchTweets(nextUrlPage);
-					}
-				});
+				
 
 				
 			});	

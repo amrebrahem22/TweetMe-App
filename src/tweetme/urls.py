@@ -13,6 +13,7 @@ urlpatterns = [
     path('tweet/', include('tweets.urls', namespace="tweet")),
     path('api/tweets/', include('tweets.api.urls')),
     path('', include('accounts.urls', namespace='accounts')),
+    path('api/tweet/', include('accounts.api.urls', namespace='profile-tweets')),
 ]
 
 if settings.DEBUG:

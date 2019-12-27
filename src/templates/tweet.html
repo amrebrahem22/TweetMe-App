@@ -28,9 +28,7 @@
 	</p>
 	<hr/>
 	<h1>Tweets({{object.tweet_set.all.count}})</h1>
-	<div>
-		{% for tweet in object.tweet_set.all %}
-			<p>{{ tweet }}</p>
-		{% endfor %}
+	<div id="tweets-container" data-url='/api/tweet/{{object.username}}/tweets/'>
 	</div>
+	<div><a href="" id="loadMore">Load more</a></div>
 {% endblock %}
