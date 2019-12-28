@@ -8,6 +8,8 @@ class ParentTweetSerializer(serializers.ModelSerializer):
 	user = UserSreializer(read_only=True)
 	date_display = serializers.SerializerMethodField()
 	timesince = serializers.SerializerMethodField()
+	likes = serializers.SerializerMethodField()
+	did_liked = serializers.SerializerMethodField()
 
 	class Meta:
 		model = Tweet
@@ -17,8 +19,23 @@ class ParentTweetSerializer(serializers.ModelSerializer):
 			'content',
 			'timestamp',
 			'date_display',
-			'timesince'
+			'timesince',
+			'parent',
+			'likes',
+			'did_liked'
 		]
+
+	def get_did_liked(self, obj):
+		request = self.context.get('request')
+		user = request.user
+		if user.is_authenticated:
+			if user in obj.liked.all():
+				return True
+		return False
+
+
+	def get_likes(self, obj):
+		return obj.liked.all().count()
 
 	def get_date_display(self, obj):
 		return obj.timestamp.strftime("%b %d %Y, at %I:%M %p")
@@ -46,7 +63,8 @@ class TweetSerializer(serializers.ModelSerializer):
 			'timesince',
 			'parent',
 			'likes',
-			'did_liked'
+			'did_liked',
+			'reply'
 		]
 
 	def get_did_liked(self, obj):

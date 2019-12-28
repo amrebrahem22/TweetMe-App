@@ -314,14 +314,24 @@
                     tweetContainer = $('#tweets-container')
                 }
                 var initialUrl = tweetContainer.attr('data-url') || '/api/tweets/';
-                console.log(tweetContainer)
+
+                $(document.body).on("click", ".tweet-reply", function(e){
+                    e.preventDefault()
+                    var this_ = $(this)
+                    var parentId = this_.attr("data-id")
+                    var username = this_.attr("data-user")
+                    $("#replyModal").modal({})
+                    $("#replyModal textarea").val("@" + username + " ")
+                    $("#replyModal").on("shown.bs.modal", function(){
+                        $('textarea').focus()
+                    })
+                })
 
 
                 $(document.body).on('click', '.tweet-like', function (e) {
                     e.preventDefault();
                     var this_ = $(this);
                     var btnUrl = '/api/tweets/' + this_.attr('data-id') + '/like/';
-                    console.log(btnUrl);
 
                     $.ajax({
                         url: btnUrl,
@@ -339,7 +349,7 @@
                     });
                 });
 
-                $(document.body).on('click', '.retweetBtn',function (e) {
+                $(document.body).on('click', '.retweetBtn', function (e) {
                     e.preventDefault();
                     var btnUrl = 'api' + $(this).attr('href');
 
@@ -347,7 +357,6 @@
                         url: btnUrl,
                         method: 'GET',
                         success: function (data) {
-                            console.log(data);
                             displayTweets(data, true, true)
                             updateHashLinks()
                         },
@@ -390,20 +399,25 @@
                     if (tweetVal.did_liked) {
                         verb = 'Unlike';
                     }
-                    console.log(tweetVal.did_liked)
 
-                    if (retweet && tweetVal.parent) {
+                    var tweetAppend;
+                    if (retweet && tweetVal.parent&& !tweetVal.reply) {
                         var mainTweet = tweetVal.parent;
                         
-                        var tweet = "<div class='tweet first'>" + "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>" + " <span>from</span> <a href='/tweet/" + mainTweet.id + "'>view</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='tweet-like time-ago scnd-font-color' href='#' data-id="+ tweetVal.id +">" + verb + "(" + tweetVal.likes + ")</a></div>";
+                        tweetAppend = "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>";
+                    } else if (tweetVal.parent && tweetVal.reply) {
+                          tweetAppend = "<p>" + tweetVal.content + " | <span>Reply to</span> <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a></p>";
                     } else {
-                        var tweet = "<div class='tweet first'>" + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='tweet-like time-ago scnd-font-color' href='#' data-id="+ tweetVal.id +">" + verb + "(" + tweetVal.likes + ")</a></p></div>";    
+                        tweetAppend = ''
                     }
+
+                    var tweet = tweetAppend + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='tweet-like time-ago scnd-font-color' href='#' data-id="+ tweetVal.id +">" + verb + "(" + tweetVal.likes + ")</a> | <a class='time-ago scnd-font-color tweet-reply' href='#' data-id="+ tweetVal.id +" data-user="+ tweetVal.user.username +">Reply</a></p>";  
+                    var container = "<div class='tweet first'>" + tweet + "</div>";
                     
                     if (prepend == true) {
-                        $(tweetContainer).prepend(tweet)
+                        $(tweetContainer).prepend(container)
                     } else {
-                        $(tweetContainer).append(tweet)
+                        $(tweetContainer).append(container)
                     }
                 }
 
@@ -459,52 +473,54 @@
                         fetchTweets(nextUrlPage);
                     }
                 });
+
+                var startLength = 140;
+                var currLength = 0;
+                var CounterP = $('.create-tweet p');
+
+                $('.create-tweet textarea').keyup(function (e) {
+                    var textVal = $(this).val();
+                    
+                    currLength = startLength - textVal.length;
+                    CounterP.text(currLength);
+
+                    if (currLength >= 0) {
+                        CounterP.css({'color': '#556292'});
+                    } else {
+                        CounterP.css({'color': '#dc3545'});
+                    }
+                });
+
+                $('.create-tweet').submit(function (e) {
+                    e.preventDefault();
+                    var this_ = $(this).serialize();
+                    if (currLength >= 0) {
+                        $.ajax({
+                            url: '/api/tweets/create/',
+                            method: 'Post',
+                            data: this_,
+                            success: function(data) {
+                                displayTweets(data, true);
+                                $('.create-tweet').find('textarea').val('')
+                                CounterP.text("Maximum length 140 character");
+                                updateHashLinks();
+                            },
+                            error: function(error) {
+                                console.log(error)
+                            }
+                        });
+                    } else {
+                        CounterP.text("Tweet Can't be more than 140 Character.");
+                    }
+                    
+                });
             }
 
 			$(document).ready(function() {
 
 				loadTweetsContainer();
 
-				var startLength = 140;
-				var currLength = 0;
-				var CounterP = $('.create-tweet p');
-
-				$('.create-tweet textarea').keyup(function (e) {
-					var textVal = $(this).val();
-					
-					currLength = startLength - textVal.length;
-					CounterP.text(currLength);
-
-					if (currLength >= 0) {
-						CounterP.css({'color': '#556292'});
-					} else {
-						CounterP.css({'color': '#dc3545'});
-					}
-				});
-
-				$('.create-tweet').submit(function (e) {
-					e.preventDefault();
-					var this_ = $(this).serialize();
-					if (currLength >= 0) {
-						$.ajax({
-							url: '/api/tweets/create/',
-							method: 'Post',
-							data: this_,
-							success: function(data) {
-								displayTweets(data, true)
-								$('.create-tweet').find('textarea').val('')
-								CounterP.text("Maximum length 140 character");
-                                updateHashLinks();
-							},
-							error: function(error) {
-								console.log(error)
-							}
-						});
-					} else {
-						CounterP.text("Tweet Can't be more than 140 Character.");
-					}
-					
-				});
+				
 
 
 				// Auto Search
@@ -534,6 +550,7 @@
 			});	
 		</script>
 	{% endblock %}
+    {% include "reply-modal.html" %}
 	<script type="text/javascript" src="{% static "static/js/popper.min.js" %}"></script>
 	<script type="text/javascript" src="{% static "static/js/bootstrap.min.js" %}"></script>
 
