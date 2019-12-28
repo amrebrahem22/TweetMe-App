@@ -321,6 +321,8 @@
                     var parentId = this_.attr("data-id")
                     var username = this_.attr("data-user")
                     $("#replyModal").modal({})
+                    $("#replyModal .modal-body").append("<input type='hidden' name='parent_id' value='" + parentId + "'/>");
+                    $("#replyModal .modal-body").append("<input type='hidden' name='reply' value='" + true + "'/>");
                     $("#replyModal textarea").val("@" + username + " ")
                     $("#replyModal").on("shown.bs.modal", function(){
                         $('textarea').focus()
@@ -401,12 +403,13 @@
                     }
 
                     var tweetAppend;
+                    var mainTweet = tweetVal.parent;
                     if (retweet && tweetVal.parent&& !tweetVal.reply) {
-                        var mainTweet = tweetVal.parent;
+                        
                         
                         tweetAppend = "<p>" + mainTweet.content + " | <span>Retweet Via</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a>" + "</p>" + "<p> <span>on</span> <a class='time-ago scnd-font-color' href='#18'>"+ mainTweet.date_display +"</a></p>";
                     } else if (tweetVal.parent && tweetVal.reply) {
-                          tweetAppend = "<p>" + tweetVal.content + " | <span>Reply to</span> <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a></p>";
+                          tweetAppend = "<p>" + mainTweet.content + " | <span>Reply to</span> <a href='" + mainTweet.user.url + "' class='tweet-link'>@" + mainTweet.user.username + "</a></p>";
                     } else {
                         tweetAppend = ''
                     }
@@ -504,6 +507,7 @@
                                 $('.create-tweet').find('textarea').val('')
                                 CounterP.text("Maximum length 140 character");
                                 updateHashLinks();
+                                $("#replyModal").model('hide')
                             },
                             error: function(error) {
                                 console.log(error)
@@ -512,6 +516,7 @@
                     } else {
                         CounterP.text("Tweet Can't be more than 140 Character.");
                     }
+
                     
                 });
             }

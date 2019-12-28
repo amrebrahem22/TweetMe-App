@@ -45,6 +45,7 @@ class ParentTweetSerializer(serializers.ModelSerializer):
 
 
 class TweetSerializer(serializers.ModelSerializer):
+	parent_id = serializers.CharField(write_only=True, required=False)
 	user = UserSreializer(read_only=True)
 	date_display = serializers.SerializerMethodField()
 	timesince = serializers.SerializerMethodField()
@@ -55,6 +56,7 @@ class TweetSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Tweet
 		fields = [
+			'parent_id',
 			'id',
 			'user',
 			'content',
