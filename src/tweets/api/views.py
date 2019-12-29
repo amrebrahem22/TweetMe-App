@@ -34,6 +34,16 @@ class TweetList(generics.ListAPIView):
 			)
 		return queryset	
 
+class TweetDetailList(generics.ListAPIView):
+	serializer_class = TweetSerializer
+	pagination_class = TweetsPagination
+	permission_classes = [permissions.AllowAny]
+
+	def get_queryset(self, *args, **kwargs):
+		requested_pk = self.kwargs.get('pk')
+		queryset = Tweet.objects.filter(pk=requested_pk).order_by('-timestamp')
+		return queryset	
+
 
 class TweetRetrieveAPIView(generics.RetrieveAPIView):
 	serializer_class = TweetSerializer
