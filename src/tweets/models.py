@@ -21,6 +21,7 @@ class TweetManager(models.Manager):
 				timestamp__year=timezone.now().year,
 				timestamp__month=timezone.now().month,
 				timestamp__day=timezone.now().day,
+				reply=False
 			)
 
 		if qs.exists():
@@ -58,6 +59,18 @@ class Tweet(models.Model):
 
 	def __str__(self):
 		return self.content[:50]
+
+	def get_parent(self):
+		the_parent = self
+		if self.parent:
+			the_parent = self.parent
+		return the_parent
+
+	def get_children(self):
+		parent = self.get_parent()
+		qs1 = Tweet.objects.filter(parent=parent)
+		qs2 = Tweet.objects.filter(pk=parent.pk)
+		return (qs1 | qs2)
 
 	def get_absolute_url(self):
 		return reverse('tweet:detail', kwargs={'pk': self.pk})

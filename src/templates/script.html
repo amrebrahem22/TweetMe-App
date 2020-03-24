@@ -103,6 +103,11 @@
 
                     var tweetAppend;
                     var mainTweet = tweetVal.parent;
+                    var replyId = tweetVal.id 
+                    if (tweetVal.parent) {
+                        replyId = tweetVal.parent.id
+                    }
+
                     if (retweet && tweetVal.parent&& !tweetVal.reply) {
                         
                         
@@ -113,7 +118,7 @@
                         tweetAppend = ''
                     }
 
-                    var tweet = tweetAppend + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/'>View</a> | <a class='time-ago scnd-font-color tweet-reply' href='#' data-id="+ tweetVal.id +" data-user="+ tweetVal.user.username +"  data-id="+ tweetVal.id +" data-content='"+ tweetVal.content + "'>Reply</a></p>";  
+                    var tweet = tweetAppend + "<p>" + tweetVal.content + " <a href='" + tweetVal.user.url + "' class='tweet-link'>@" + tweetVal.user.username + "</a>" + "</p>" + "<p><a class='time-ago scnd-font-color' href='#18'>"+ tweetVal.date_display +"</a> | <a class='time-ago scnd-font-color retweetBtn' href='/tweets/"+ tweetVal.id +"/retweet/'>Retweet</a> | <a class='time-ago scnd-font-color' href='/tweet/"+ tweetVal.id +"/'>View</a> | <a class='time-ago scnd-font-color tweet-reply' href='#' data-user="+ tweetVal.user.username +"  data-id="+ replyId +" data-content='"+ tweetVal.content + "'>Reply</a></p>";  
                     var container = "<div class='tweet first'>" + tweet + "</div>";
                     
                     if (prepend == true) {
@@ -265,7 +270,7 @@
 
 				function done_search() {
 					if (inputVal) {
-						document.location.href='/?q='+inputVal
+						document.location.href='/search/?q='+inputVal
 					}
 				}
 

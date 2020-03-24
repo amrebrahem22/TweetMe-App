@@ -19,7 +19,7 @@
         </li>
     </ul>
     <div class="search">
-        <form action="." method="GET" class="search-form">
+        <form action="{% url 'search' %}" method="GET" class="search-form">
             <div class="input-group">
                 <input class="search-input" type="text" name="q" value="{{request.GET.q}}">
                 <input type="submit" value="Search">

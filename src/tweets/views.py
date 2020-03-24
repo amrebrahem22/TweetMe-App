@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import HttpResponseRedirect
@@ -9,9 +10,22 @@ from .forms import TweetForm
 from .mixins import FormUserNeededMixin
 
 
+User = get_user_model()
+
 # Create your views here.
 def index(request):
 	return render(request, 'base.html')
+
+class SearchView(View):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get("q")
+        qs = None
+        if query:
+            qs = User.objects.filter(
+                    Q(username__icontains=query)
+                )
+        context = {"users": qs}
+        return render(request, "search.html", context)
 
 
 class Retweet(View):
